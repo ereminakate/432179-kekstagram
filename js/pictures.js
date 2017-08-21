@@ -1,8 +1,5 @@
 'use strict';
 
-var userDialog = document.querySelector('.gallery-overlay');
-userDialog.classList.remove('invisible');
-debugger;
 var pictureTemplate = document.querySelector('#picture-template').content;
 
 var listPictures = document.querySelector('.pictures');
@@ -16,8 +13,8 @@ var pictures = createPictures();
 function createPictures() {
   var arrPictures = [];
   for (var i = 0; i < 25; i++) {
-    pictures[i] = {
-      url: 'photos/' + randomInteger(1, 25) + '.jpg',
+    arrPictures[i] = {
+      url: './photos/' + (i + 1) + '.jpg',
       likes: randomInteger(15, 200),
       comments: randomComments()
     };
@@ -49,7 +46,7 @@ function renderPictures(pic) {
   var elementPicture = pictureTemplate.cloneNode(true);
   elementPicture.querySelector('.picture-comments').textContent = pic.comments;
   elementPicture.querySelector('.picture-likes').textContent = pic.likes;
-  elementPicture.querySelector('img').style.src = pic.url;
+  elementPicture.querySelector('img').setAttribute('src', pic.url);
 
   return elementPicture;
 }
@@ -65,6 +62,7 @@ document.querySelector('.upload-overlay').classList.add('hidden');
 
 var galleryOverlay = document.querySelector('.gallery-overlay');
 galleryOverlay.classList.remove('hidden');
-galleryOverlay.querySelector('gallery-overlay-image').style.src = pictures[0].url;
-galleryOverlay.querySelector('likes-count').style.src = pictures[0].likes;
-galleryOverlay.querySelector('comments-count').style.src = pictures[0].comments;
+
+galleryOverlay.querySelector('.gallery-overlay-image').setAttribute('src', pictures[0].url);
+galleryOverlay.querySelector('.likes-count').textContent = pictures[0].likes;
+galleryOverlay.querySelector('.comments-count').textContent = pictures[0].comments;
