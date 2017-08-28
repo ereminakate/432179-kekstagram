@@ -18,33 +18,21 @@ var pictures = createDescriptionPictures();
 
 // Функция создания массива, состоящего из 25 сгенерированных JS объектов, которые будут описывать фотографии, размещенные другими пользователями
 function createDescriptionPictures() {
-  var arrPictures = [];
+  var arrDescriptionPictures = [];
   for (var i = 0; i < PHOTO_COUNT; i++) {
-    arrPictures[i] = {
+    arrDescriptionPictures[i] = {
       url: './photos/' + (i + 1) + '.jpg',
       likes: randomInteger(LIKES_MIN, LIKES_MAX),
       comments: randomComments()
     };
   }
-  return arrPictures;
+  return arrDescriptionPictures;
 }
 
 // Функция выбора случайных чисел
 function randomInteger(min, max) {
   return Math.floor(min + Math.random() * (max - min + 1));
 }
-
-// Функция выбора случайного комментария
-/* function randomComments() {
-  var numberComments = randomInteger(COMMENTS_MIN, COMMENTS_MAX);
-  var comment = '';
-  if (numberComments === 1) {
-    comment += USER_COMMENTS[randomInteger(0, USER_COMMENTS.length - 1)];
-  } else {
-    comment += USER_COMMENTS[randomInteger(0, USER_COMMENTS.length - 1)] + ' ' + USER_COMMENTS[randomInteger(0, USER_COMMENTS.length - 1)];
-  }
-  return comment;
-}*/
 
 function randomComments() {
   var numberComments = randomInteger(COMMENTS_MIN, COMMENTS_MAX);
@@ -67,13 +55,9 @@ function renderPictures(pic) {
 
 // Вставка фотографии с данными в оверлей
 function setPhotoToOverlay(element) {
-  var elementImg = element.querySelector('img').getAttribute('src');
-  var elementLikes = element.querySelector('.picture-likes').textContent;
-  var elementComments = element.querySelector('.picture-comments').textContent;
-
-  galleryOverlay.querySelector('.gallery-overlay-image').setAttribute('src', elementImg);
-  galleryOverlay.querySelector('.likes-count').textContent = elementLikes;
-  galleryOverlay.querySelector('.comments-count').textContent = elementComments;
+  galleryOverlay.querySelector('.gallery-overlay-image').setAttribute('src', element.querySelector('img').getAttribute('src'));
+  galleryOverlay.querySelector('.likes-count').textContent = element.querySelector('.picture-likes').textContent;
+  galleryOverlay.querySelector('.comments-count').textContent = element.querySelector('.picture-comments').textContent;
 }
 
 var fragment = document.createDocumentFragment();
@@ -84,58 +68,39 @@ for (var i = 0; i < pictures.length; i++) {
 
 listPictures.appendChild(fragment);
 
-// ---------> Обработчики событий
-// Открытие галереи
-function galleryOpen() {
-  galleryOverlay.classList.remove('hidden');
-  listPictures.removeEventListener('click', onPictureClick);
-  galleryOverlayClose.addEventListener('click', onCloseCrossClick);
-  galleryOverlayClose.addEventListener('keydown', onCloseCrossEnterPress);
-  document.addEventListener('keydown', onGalleryEscPress);
-}
-
-// Закрытие галерии
-function galleryClose() {
-  galleryOverlay.classList.add('hidden');
-  listPictures.addEventListener('click', onPictureClick);
-  galleryOverlayClose.removeEventListener('click', onCloseCrossClick);
-  galleryOverlayClose.removeEventListener('keydown', onCloseCrossEnterPress);
-  document.removeEventListener('keydown', onGalleryEscPress);
-}
-
-// Клик на фотографии
-function onPictureClick(event) {
-  event.preventDefault();
-  var clickTarget = event.target;
-
-  while (clickTarget !== listPictures) {
-    if (clickTarget.classList.contains('picture')) {
-      setPhotoToOverlay(clickTarget);
-      galleryOpen();
-      break;
+function onClosePicture(event) {
+  if (event.keyCode === ESC_KEYCODE
+    || (event.keyCode === ENTER_KEYCODE && event.target.classList.contains('gallery-overlay-close'))
+    || event.type === 'click') {
+    if (!galleryOverlay.classList.contains('hidden')){
+      galleryOverlay.classList.add('hidden');
     }
-    clickTarget = clickTarget.parentElement;
   }
 }
 
-// Клик на крестике галереи
-function onCloseCrossClick(event) {
-  galleryClose();
+galleryOverlayClose.addEventListener('click', onClosePicture, false);
+document.addEventListener('keydown', onClosePicture, false);
+
+// Функция добавления обработчиков открытия картинки при клике
+var arrPictures = listPictures.querySelectorAll('.picture');
+
+for (var index = 0; index < arrPictures.length; index++) {
+
+  var item = arrPictures[index];
+
+  item.addEventListener('click', function (event) {
+    event.preventDefault();
+    setPhotoToOverlay(event.target.parentNode);
+    galleryOverlay.classList.remove('hidden');
+  });
+
+  item.addEventListener('keydown', function (event) {
+    if (event.keyCode === ENTER_KEYCODE) {
+      event.preventDefault();
+      setPhotoToOverlay(event.target);
+      galleryOverlay.classList.remove('hidden');
+    }
+  });
 }
 
-// Нажатие Enter на крестике галереи
-function onCloseCrossEnterPress(event) {
-  if (event.keyCode === ENTER_KEYCODE) {
-    galleryClose();
-  }
-}
-// Нажатие на ESC при открытой галерее
-function onGalleryEscPress(event) {
-  if (event.keyCode === ESC_KEYCODE) {
-    galleryClose();
-  }
-}
-// <------ Обработчики событий
-
-listPictures.addEventListener('click', onPictureClick);
 document.querySelector('.upload-overlay').classList.add('hidden');
