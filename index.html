@@ -25,6 +25,7 @@
 </form>
 
 <form class="upload-form" id="upload-select-image" method="post"
+      action="https://1510.dump.academy/kekstagram"
       enctype="multipart/form-data"
       autocomplete="off">
   <div class="upload-image">
@@ -38,7 +39,7 @@
         <button type="button"
                 class="upload-resize-control upload-resize-controls-button upload-resize-controls-button-dec">–
         </button><!--
-        --><input type="text" class="upload-resize-control upload-resize-controls-value" value="55%" readonly title="Image Scale" name="scale"/><!--
+        --><input type="text" class="upload-resize-control upload-resize-controls-value" value="100%" minlength="25%" step="25%" maxlength="100%" readonly title="Image Scale" name="scale"/><!--
         --><button type="button"
                 class="upload-resize-control upload-resize-controls-button upload-resize-controls-button-inc">+
         </button>
@@ -96,7 +97,7 @@
 
       <input class="upload-form-hashtags" name="hashtags" placeholder="#хэш-тег">
 
-      <textarea class="upload-form-description" name="description" placeholder="Ваш комментарий..."></textarea>
+      <textarea class="upload-form-description" name="description" tabindex="0" placeholder="Ваш комментарий..." minlength="30" maxlength="100" required></textarea>
 
       <button class="upload-form-cancel" type="reset" id="upload-cancel"></button>
       <button class="upload-form-submit" type="submit" id="upload-submit">Отправить</button>
@@ -135,7 +136,7 @@
 
 
 <div class="gallery-overlay hidden">
-  <span class="gallery-overlay-close">&times;</span>
+  <span class="gallery-overlay-close" tabindex="0">&times;</span>
   <div class="gallery-overlay-preview">
     <img src="" class="gallery-overlay-image" alt="">
     <div class="gallery-overlay-controls">
