@@ -14,8 +14,10 @@ var uploadResizeControlsButtons = uploadSselectImage.querySelectorAll('.upload-r
 var effectImagePreview = uploadOverlay.querySelector('.effect-image-preview');
 var uploadFormHashtags = uploadOverlay.querySelector('.upload-form-hashtags');
 
-var STEP_DEC = -25;
-var STEP_INC = 25;
+// var STEP_DEC = -25;
+// var STEP_INC = 25;
+
+var STEP = 25;
 var USER_COMMENTS = ['Всё отлично!', 'В целом всё неплохо. Но не всё.', 'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.', 'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.', 'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.', 'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'];
 var PHOTO_COUNT = 25;
 var LIKES_MIN = 15;
@@ -179,30 +181,19 @@ uploadFormDescription.addEventListener('input', function (evt) {
   }
 });
 
-// Функция изменения значения масштаба картинки при нажатии на "+" или "-"
-function onResizeButton(stepResize) {
-  var valueFile = uploadResizeControlsValue.value.substring(0, uploadResizeControlsValue.value.length - 1);
-  valueFile = Number(valueFile) + stepResize;
 
-  if ((valueFile >= 25) && (valueFile <= 100)) {
-    uploadResizeControlsValue.value = valueFile + '%';
-  }
-
-  var transformValue = uploadResizeControlsValue.value.substring(0, uploadResizeControlsValue.value.length - 1) / 100;
-  effectImagePreview.style.cssText = 'transform: scale(' + transformValue + ')';
-}
-
-// События нажатия кнопок уменьшения или увеличения масштаба картинки ---->
+// тут можно упростить код, равно как и избавиться от количества переменных, взгляни.
 for (var i = 0; i < uploadResizeControlsButtons.length; i++) {
-  uploadResizeControlsButtons[i].addEventListener('click', function () {
-    if (document.activeElement.classList.contains('upload-resize-controls-button-dec')) {
-      onResizeButton(STEP_DEC);
-    } else {
-      onResizeButton(STEP_INC);
+  uploadResizeControlsButtons[i].addEventListener('click', function (event) {
+    var step = event.target.classList.contains('upload-resize-controls-button-inc') ? STEP : -STEP;
+    var valueFile = parseInt(uploadResizeControlsValue.value.substring(0, uploadResizeControlsValue.value.length - 1), 10);
+    var newSize = valueFile + step;
+    if (newSize <= 100 && newSize >= 25) {
+      uploadResizeControlsValue.value = newSize + '%';
+      effectImagePreview.style.cssText = 'transform: scale(' + newSize / 100 + ')';
     }
   });
 }
-// <--------
 
 // ---- Применение фильтров ---->
 function onChangeFilterEffects(evt) {
@@ -235,6 +226,10 @@ function onValidHashtags() {
         break;
       } else if (arrayHashtags[index].charAt(0) !== '#') {
         target.setCustomValidity('Хэштэг должен начинаться с символа "#"');
+        target.style.borderColor = 'red';
+        break;
+      } else if (arrayHashtags[index].lastIndexOf('#') > 0) {
+        target.setCustomValidity('Хэштэги должны разделяться пробелом');
         target.style.borderColor = 'red';
         break;
       } else if ((index !== arrayHashtags.length - 1) && (arrayHashtags[index + 1] === arrayHashtags[index])) {
