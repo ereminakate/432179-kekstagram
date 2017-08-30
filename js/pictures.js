@@ -4,7 +4,20 @@ var pictureTemplate = document.querySelector('#picture-template').content;
 var listPictures = document.querySelector('.pictures');
 var galleryOverlay = document.querySelector('.gallery-overlay');
 var galleryOverlayClose = document.querySelector('.gallery-overlay-close');
+var uploadSselectImage = document.querySelector('#upload-select-image');
+var uploadFile = uploadSselectImage.querySelector('#upload-file');
+var uploadOverlay = uploadSselectImage.querySelector('.upload-overlay');
+var uploadFormCancel = uploadSselectImage.querySelector('.upload-form-cancel');
+var uploadFormDescription = uploadSselectImage.querySelector('.upload-form-description');
+var uploadResizeControlsValue = uploadSselectImage.querySelector('.upload-resize-controls-value');
+var uploadResizeControlsButtons = uploadSselectImage.querySelectorAll('.upload-resize-controls-button');
+var effectImagePreview = uploadOverlay.querySelector('.effect-image-preview');
+var uploadFormHashtags = uploadOverlay.querySelector('.upload-form-hashtags');
 
+// var STEP_DEC = -25;
+// var STEP_INC = 25;
+
+var STEP = 25;
 var USER_COMMENTS = ['Всё отлично!', 'В целом всё неплохо. Но не всё.', 'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.', 'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.', 'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.', 'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'];
 var PHOTO_COUNT = 25;
 var LIKES_MIN = 15;
@@ -104,3 +117,137 @@ for (var index = 0; index < arrPictures.length; index++) {
 }
 
 document.querySelector('.upload-overlay').classList.add('hidden');
+
+// -------------- Показ/скрытие формы кадрирования --------->
+
+// Изменение значения поля загрузки фотографии
+function onUploadFile() {
+  uploadSselectImage.querySelector('.upload-image').classList.add('hidden');
+  uploadOverlay.classList.remove('hidden');
+  document.addEventListener('keydown', onUploadOverlayEscPress);
+}
+
+function onUploadOverlayEscPress(evt) {
+  if (document.activeElement.classList.contains('upload-form-description')) {
+    return;
+  }
+  if (evt.keyCode === ESC_KEYCODE) {
+    onCloseUploadOverlay();
+  }
+}
+
+function onCloseUploadOverlay() {
+  uploadSselectImage.querySelector('.upload-image').classList.remove('hidden');
+  uploadOverlay.classList.add('hidden');
+}
+
+uploadFile.addEventListener('change', onUploadFile);
+uploadFormCancel.addEventListener('click', onCloseUploadOverlay);
+uploadFormCancel.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    onCloseUploadOverlay();
+  }
+});
+// <-------------- Показ/скрытие формы кадрирования ---------
+
+// ------ Валидация и отправка формы, применение фильтров к картинке ----->
+
+uploadFormDescription.addEventListener('invalid', function () {
+  if (!uploadFormDescription.validity.valid) {
+    if (uploadFormDescription.value.length < 30) {
+      uploadFormDescription.setCustomValidity('Комментарий должен содержать не менее 30 символов');
+      uploadFormDescription.style.borderColor = 'red';
+    } else if (uploadFormDescription.value.length > 100) {
+      uploadFormDescription.setCustomValidity('Комментарий должен содержать не более 100 символов');
+      uploadFormDescription.style.borderColor = 'red';
+    } else if (uploadFormDescription.validity.valueMissing) {
+      uploadFormDescription.setCustomValidity('Обязательное поле');
+      uploadFormDescription.style.borderColor = 'red';
+    }
+  } else {
+    uploadFormDescription.setCustomValidity('');
+    uploadFormDescription.style.border = 'none';
+  }
+});
+
+uploadFormDescription.addEventListener('input', function (evt) {
+  var target = evt.target;
+  if (target.value.length < 30) {
+    target.setCustomValidity('Комментарий должен содержать не менее 30 символов');
+    uploadFormDescription.style.borderColor = 'red';
+  } else {
+    target.setCustomValidity('');
+    target.style.border = 'none';
+  }
+});
+
+
+// тут можно упростить код, равно как и избавиться от количества переменных, взгляни.
+for (var i = 0; i < uploadResizeControlsButtons.length; i++) {
+  uploadResizeControlsButtons[i].addEventListener('click', function (event) {
+    var step = event.target.classList.contains('upload-resize-controls-button-inc') ? STEP : -STEP;
+    var valueFile = parseInt(uploadResizeControlsValue.value.substring(0, uploadResizeControlsValue.value.length - 1), 10);
+    var newSize = valueFile + step;
+    if (newSize <= 100 && newSize >= 25) {
+      uploadResizeControlsValue.value = newSize + '%';
+      effectImagePreview.style.cssText = 'transform: scale(' + newSize / 100 + ')';
+    }
+  });
+}
+
+// ---- Применение фильтров ---->
+function onChangeFilterEffects(evt) {
+  effectImagePreview.className = 'effect-image-preview';
+  var target = evt.target;
+
+  if (target.tagName !== 'INPUT') {
+    return;
+  }
+  var newFilterClass = target.id.replace('upload-', '');
+  effectImagePreview.classList.add(newFilterClass);
+}
+
+uploadOverlay.querySelector('.upload-effect-controls').addEventListener('click', onChangeFilterEffects);
+// <---- Применение фильтров ----
+
+// --------- Проверка написания хэштэгов ------>
+function onValidHashtags() {
+  var target = event.target;
+  var arrayHashtags = target.value.split(' ');
+  if (arrayHashtags.length > 5) {
+    target.setCustomValidity('В строке указано больше 5 хэштэгов');
+    target.style.borderColor = 'red';
+  } else {
+    for (var index = 0; index < arrayHashtags.length; index++) {
+      arrayHashtags.sort();
+      if (arrayHashtags[index].length > 20) {
+        target.setCustomValidity('Хэштэг не может содержать более 20 символов');
+        target.style.borderColor = 'red';
+        break;
+      } else if (arrayHashtags[index].charAt(0) !== '#') {
+        target.setCustomValidity('Хэштэг должен начинаться с символа "#"');
+        target.style.borderColor = 'red';
+        break;
+      } else if (arrayHashtags[index].lastIndexOf('#') > 0) {
+        target.setCustomValidity('Хэштэги должны разделяться пробелом');
+        target.style.borderColor = 'red';
+        break;
+      } else if ((index !== arrayHashtags.length - 1) && (arrayHashtags[index + 1] === arrayHashtags[index])) {
+        target.setCustomValidity('В строке указаны повторяющиеся хэштэги');
+        target.style.borderColor = 'red';
+        break;
+      } else {
+        target.setCustomValidity('');
+        target.style.border = 'none';
+      }
+    }
+  }
+}
+
+uploadFormHashtags.addEventListener('change', onValidHashtags);
+// --------- Проверка написания хэштэгов <------
+//
+// <----- Валидация и отправка формы, применение фильтров к картинке --------
+//
+// <------ Обработчики событий ------------------------------
+// **********************************************************
