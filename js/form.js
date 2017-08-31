@@ -16,12 +16,15 @@
   var uploadResizeControlsButtons = uploadSselectImage.querySelectorAll('.upload-resize-controls-button');
   var effectImagePreview = uploadOverlay.querySelector('.effect-image-preview');
   var uploadFormHashtags = uploadOverlay.querySelector('.upload-form-hashtags');
+  var uploadEffectLevelPin = uploadOverlay.querySelector('.upload-effect-level-pin');
+  var uploadEffectLevelVal = uploadOverlay.querySelector('.upload-effect-level-val');
 
 // -------------- Показ/скрытие формы кадрирования --------->
   function onUploadFile() {
     uploadSselectImage.querySelector('.upload-image').classList.add('hidden');
     uploadOverlay.classList.remove('hidden');
     document.addEventListener('keydown', onUploadOverlayEscPress);
+    uploadOverlay.querySelector('.upload-effect-level').style.display = 'none';
   }
 
   function onUploadOverlayEscPress(evt) {
@@ -94,11 +97,17 @@
 
 // ---- Применение фильтров ---->
   function onChangeFilterEffects(evt) {
-    effectImagePreview.className = 'effect-image-preview';
     var target = evt.target;
 
     if (target.tagName === 'INPUT') {
+      effectImagePreview.style.filter = '';
+      effectImagePreview.className = 'effect-image-preview';
       effectImagePreview.classList.add(target.id.replace('upload-', ''));
+      if (effectImagePreview.classList.contains('effect-none')) {
+        uploadOverlay.querySelector('.upload-effect-level').style.display = 'none';
+      } else {
+        uploadOverlay.querySelector('.upload-effect-level').style.display = '';
+      }
     } else {
       return;
     }
@@ -109,7 +118,7 @@
 
 // --------- Проверка написания хэштэгов ------>
   function onValidHashtags() {
-    debugger;
+
     var target = event.target;
     var arrayHashtags = target.value.split(' ');
     if (arrayHashtags.length > 5) {
@@ -145,4 +154,62 @@
   uploadFormHashtags.addEventListener('change', onValidHashtags);
 // --------- Проверка написания хэштэгов <------
 // <----- Валидация и отправка формы, применение фильтров к картинке --------
+
+  // Реализация движения ползунка фильтров ------>
+
+  uploadEffectLevelPin.addEventListener('mousedown', function (evt) {
+    evt.preventDefault();
+
+    var MIN_COORD = 8;
+    var MAX_COORD = 446;
+    var sliderCoord;
+
+    var startCoordsX = evt.clientX;
+
+    var onMouseMove = function (moveEvt) {
+      moveEvt.preventDefault();
+
+      var shiftX = startCoordsX - moveEvt.clientX;
+      startCoordsX = moveEvt.clientX;
+
+      if (uploadEffectLevelPin.offsetLeft - shiftX <= MIN_COORD) {
+        sliderCoord = MIN_COORD;
+      } else if (uploadEffectLevelPin.offsetLeft - shiftX >= MAX_COORD) {
+        sliderCoord = MAX_COORD;
+      } else {
+        sliderCoord = uploadEffectLevelPin.offsetLeft - shiftX;
+      }
+
+      uploadEffectLevelPin.style.left = sliderCoord + 'px';
+      var valPercent = Math.floor(sliderCoord / (MAX_COORD / 100));
+      uploadEffectLevelVal.style.width = valPercent > 100 ? 100 + '%' : valPercent + '%';
+
+      onMousedownChangeFilter(valPercent);
+    };
+
+    var onMouseUp = function (upEvt) {
+      upEvt.preventDefault();
+
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
+  // Функция реализует изменение фильтра на картинку в заданном значении ползунка
+  function onMousedownChangeFilter(value) {
+    if (effectImagePreview.classList.contains('effect-chrome')) {
+      effectImagePreview.style.filter = 'grayscale(' + (value / 100) + ')';
+    } else if (effectImagePreview.classList.contains('effect-sepia')) {
+      effectImagePreview.style.filter = 'sepia(' + value / 100 + ')';
+    } else if (effectImagePreview.classList.contains('effect-marvin')) {
+      effectImagePreview.style.filter = 'invert(' + value + '%)';
+    } else if (effectImagePreview.classList.contains('effect-phobos')) {
+      effectImagePreview.style.filter = 'blur(' + (3 / (100 / value)) + 'px)';
+    } else if (effectImagePreview.classList.contains('effect-heat')) {
+      effectImagePreview.style.filter = 'brightness(' + (3 / (100 / value)) + ')';
+    }
+  }
+// Реализация движения ползунка фильтров <------
 })();
