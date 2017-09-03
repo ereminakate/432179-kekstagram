@@ -103,6 +103,8 @@
 // <--------
 
 // ---- Применение фильтров ---->
+  window.initializeScale(uploadOverlay.querySelector('.upload-effect-controls'), onChangeFilterEffects);
+
   function onChangeFilterEffects(evt) {
     var target = evt.target;
 
@@ -119,8 +121,6 @@
       return;
     }
   }
-
-  uploadOverlay.querySelector('.upload-effect-controls').addEventListener('click', onChangeFilterEffects);
 // <---- Применение фильтров ----
 
 // --------- Проверка написания хэштэгов ------>

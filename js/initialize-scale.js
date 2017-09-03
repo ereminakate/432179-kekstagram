@@ -1,6 +1,5 @@
 'use strict';
 
-(function initializeScale(scaleElement, adjustScale) {
-  scaleElement.addEventListener('click', adjustScale, false);
-})();
-
+var initializeScale = function (el, fn) {
+    el.addEventListener('click', fn, false);
+};
