@@ -13,7 +13,7 @@
   var uploadOverlay = uploadSselectImage.querySelector('.upload-overlay');
   var uploadFormDescription = uploadSselectImage.querySelector('.upload-form-description');
   var uploadResizeControlsValue = uploadSselectImage.querySelector('.upload-resize-controls-value');
-  var uploadResizeControlsButtons = uploadSselectImage.querySelectorAll('.upload-resize-controls-button');
+  var uploadResizeControls = uploadSselectImage.querySelector('.upload-resize-controls');
   var effectImagePreview = uploadOverlay.querySelector('.effect-image-preview');
   var uploadFormHashtags = uploadOverlay.querySelector('.upload-form-hashtags');
   var uploadEffectLevelPin = uploadOverlay.querySelector('.upload-effect-level-pin');
@@ -82,16 +82,23 @@
   });
 
 // Изменение значения масштаба картинки при нажатии на "+" или "-"
-  for (var i = 0; i < uploadResizeControlsButtons.length; i++) {
-    uploadResizeControlsButtons[i].addEventListener('click', function (event) {
-      var step = event.target.classList.contains('upload-resize-controls-button-inc') ? STEP : -STEP;
-      var valueFile = parseInt(uploadResizeControlsValue.value.substring(0, uploadResizeControlsValue.value.length - 1), 10);
-      var newSize = valueFile + step;
-      if (newSize <= 100 && newSize >= 25) {
-        uploadResizeControlsValue.value = newSize + '%';
-        effectImagePreview.style.cssText = 'transform: scale(' + newSize / 100 + ')';
+  window.initializeScale(uploadResizeControls, adjustScale);
+
+  function adjustScale(event) {
+    var scale = function () {
+      if (event.target.tagName === 'BUTTON') {
+        var step = event.target.classList.contains('upload-resize-controls-button-inc') ? STEP : -STEP;
+        var valueFile = parseInt(uploadResizeControlsValue.value.substring(0, uploadResizeControlsValue.value.length - 1), 10);
+        var newSize = valueFile + step;
       }
-    });
+      return newSize;
+    };
+
+    var newscale = scale();
+    if (newscale <= 100 && newscale >= 25) {
+      uploadResizeControlsValue.value = newscale + '%';
+      effectImagePreview.style.cssText = 'transform: scale(' + newscale / 100 + ')';
+    }
   }
 // <--------
 
