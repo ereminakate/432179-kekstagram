@@ -20,8 +20,8 @@
   var uploadEffectLevelVal = uploadOverlay.querySelector('.upload-effect-level-val');
   var effectLevel = uploadOverlay.querySelector('.upload-effect-level');
 
-  function adjustScale(event) {
-    var step = event.target.classList.contains('upload-resize-controls-button-inc') ? STEP : -STEP;
+  function adjustScale(evt) {
+    var step = evt.target.classList.contains('upload-resize-controls-button-inc') ? STEP : -STEP;
     var valueFile = parseInt(uploadResizeControlsValue.value.substring(0, uploadResizeControlsValue.value.length - 1), 10);
     var newSize = valueFile + step;
 
@@ -32,13 +32,13 @@
   }
 
 // -------------- Показ/скрытие формы кадрирования --------->
-  function onCloseUploadOverlay(event) {
+  function onCloseUploadOverlay(evt) {
     if (document.activeElement.classList.contains('upload-form-description')) {
       return;
     }
-    if ((event.keyCode === window.helper.keyCodes.enter && document.activeElement.classList.contains('upload-form-cancel'))
-      || (event.keyCode === window.helper.keyCodes.esc)
-      || (event.type === 'click')){
+    if ((evt.keyCode === window.helper.keyCodes.enter && document.activeElement.classList.contains('upload-form-cancel'))
+      || (evt.keyCode === window.helper.keyCodes.esc)
+      || (evt.type === 'click')){
       uploadSselectImage.querySelector('.upload-image').classList.remove('hidden');
       uploadOverlay.classList.add('hidden');
     }
@@ -110,9 +110,9 @@
 // <---- Применение фильтров ----
 
 // --------- Проверка написания хэштэгов ------>
-  function onValidHashtags() {
+  function onValidHashtags(evt) {
 
-    var target = event.target;
+    var target = evt.target;
     var arrayHashtags = target.value.split(' ');
     if (arrayHashtags.length > 5) {
       target.setCustomValidity('В строке указано больше 5 хэштэгов');

@@ -12,18 +12,18 @@ var gallery = function () {
 
   listPictures.appendChild(fragment);
 
-  function openGallery(event){
-    if (event.type === 'click' || event.keyCode === window.helper.keyCodes.enter) {
-      event.preventDefault();
-      window.preview.setPhoto(event.target.parentNode);
+  function openGallery(evt) {
+    if (evt.type === 'click' || evt.keyCode === window.helper.keyCodes.enter) {
+      evt.preventDefault();
+      window.preview.setPhoto(evt.target.parentNode);
       window.preview.show();
     }
   }
 
-  function closeGallery(event) {
-    if (event.keyCode === window.helper.keyCodes.esc
-      || (event.keyCode === window.helper.keyCodes.enter && event.target.classList.contains('gallery-overlay-close'))
-      || event.type === 'click') {
+  function closeGallery(evt) {
+    if (evt.keyCode === window.helper.keyCodes.esc
+      || (evt.keyCode === window.helper.keyCodes.enter && evt.target.classList.contains('gallery-overlay-close'))
+      || evt.type === 'click') {
       if (!document.querySelector('.gallery-overlay').classList.contains('hidden')) {
         window.preview.hide();
       }
