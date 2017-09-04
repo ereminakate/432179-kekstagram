@@ -30,9 +30,9 @@
 
   function randomComments() {
     var numberComments = randomInteger(COMMENTS_MIN, COMMENTS_MAX);
-    var comments = [];
+    var comments = '';
     for (var i = 0; i < numberComments; i++) {
-      comments.push(USER_COMMENTS[randomInteger(0, USER_COMMENTS.length - 1)]);
+      comments += (USER_COMMENTS[randomInteger(0, USER_COMMENTS.length - 1)] + '\n');
     }
     return comments + ' ' + numberComments;
   }

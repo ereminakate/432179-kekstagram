@@ -4,8 +4,8 @@
 (function () {
 
   var STEP = 25;
-  var ESC_KEYCODE = 27;
-  var ENTER_KEYCODE = 13;
+  var MIN_SCALE = 25;
+  var MAX_SCALE = 100;
 
   var uploadSselectImage = document.querySelector('#upload-select-image');
   var uploadFormCancel = uploadSselectImage.querySelector('.upload-form-cancel');
@@ -18,36 +18,41 @@
   var uploadFormHashtags = uploadOverlay.querySelector('.upload-form-hashtags');
   var uploadEffectLevelPin = uploadOverlay.querySelector('.upload-effect-level-pin');
   var uploadEffectLevelVal = uploadOverlay.querySelector('.upload-effect-level-val');
+  var effectLevel = uploadOverlay.querySelector('.upload-effect-level');
 
-// -------------- Показ/скрытие формы кадрирования --------->
-  function onUploadFile() {
-    uploadSselectImage.querySelector('.upload-image').classList.add('hidden');
-    uploadOverlay.classList.remove('hidden');
-    document.addEventListener('keydown', onUploadOverlayEscPress);
-    uploadOverlay.querySelector('.upload-effect-level').style.display = 'none';
+  function adjustScale(event) {
+    var step = event.target.classList.contains('upload-resize-controls-button-inc') ? STEP : -STEP;
+    var valueFile = parseInt(uploadResizeControlsValue.value.substring(0, uploadResizeControlsValue.value.length - 1), 10);
+    var newSize = valueFile + step;
+
+    if (newSize <= MAX_SCALE && newSize >= MIN_SCALE) {
+      uploadResizeControlsValue.value = newSize + '%';
+      effectImagePreview.style.cssText = 'transform: scale(' + newSize / 100 + ')';
+    }
   }
 
-  function onUploadOverlayEscPress(evt) {
+// -------------- Показ/скрытие формы кадрирования --------->
+  function onCloseUploadOverlay(event) {
     if (document.activeElement.classList.contains('upload-form-description')) {
       return;
     }
-    if (evt.keyCode === ESC_KEYCODE) {
-      onCloseUploadOverlay();
+    if ((event.keyCode === window.helper.keyCodes.enter && document.activeElement.classList.contains('upload-form-cancel'))
+      || (event.keyCode === window.helper.keyCodes.esc)
+      || (event.type === 'click')){
+      uploadSselectImage.querySelector('.upload-image').classList.remove('hidden');
+      uploadOverlay.classList.add('hidden');
     }
   }
 
-  function onCloseUploadOverlay() {
-    uploadSselectImage.querySelector('.upload-image').classList.remove('hidden');
-    uploadOverlay.classList.add('hidden');
-  }
-
-  uploadFile.addEventListener('change', onUploadFile);
-  uploadFormCancel.addEventListener('click', onCloseUploadOverlay);
-  uploadFormCancel.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ENTER_KEYCODE) {
-      onCloseUploadOverlay();
-    }
+  uploadFile.addEventListener('change', function () {
+    uploadOverlay.classList.remove('hidden');
+    uploadFile.classList.add('hidden');
+    effectLevel.style.display = 'none';
   });
+
+  document.addEventListener('keydown', onCloseUploadOverlay, false);
+  uploadFormCancel.addEventListener('click', onCloseUploadOverlay);
+  window.initializeScale(uploadResizeControls, adjustScale);
 // <-------------- Показ/скрытие формы кадрирования ---------
 
 // ------ Валидация и отправка формы, применение фильтров к картинке ----->
@@ -81,29 +86,10 @@
     }
   });
 
-// Изменение значения масштаба картинки при нажатии на "+" или "-"
-  window.initializeScale(uploadResizeControls, adjustScale);
-
-  function adjustScale(event) {
-    var scale = function () {
-      if (event.target.tagName === 'BUTTON') {
-        var step = event.target.classList.contains('upload-resize-controls-button-inc') ? STEP : -STEP;
-        var valueFile = parseInt(uploadResizeControlsValue.value.substring(0, uploadResizeControlsValue.value.length - 1), 10);
-        var newSize = valueFile + step;
-      }
-      return newSize;
-    };
-
-    var newscale = scale();
-    if (newscale <= 100 && newscale >= 25) {
-      uploadResizeControlsValue.value = newscale + '%';
-      effectImagePreview.style.cssText = 'transform: scale(' + newscale / 100 + ')';
-    }
-  }
 // <--------
 
 // ---- Применение фильтров ---->
-  window.initializeScale(uploadOverlay.querySelector('.upload-effect-controls'), onChangeFilterEffects);
+  window.initializeFilters(uploadOverlay.querySelector('.upload-effect-controls'), onChangeFilterEffects);
 
   function onChangeFilterEffects(evt) {
     var target = evt.target;
