@@ -50,9 +50,7 @@ var gallery = function () {
   }
   var form = document.querySelector('.upload-form');
   function resetValuesForm() {
-    form.querySelector('.upload-form-description').value = '';
-    form.querySelector('.upload-form-hashtags').value = '';
-    form.querySelector('.effect-image-preview').value = 'none';
+    form.reset();
   }
 
   form.addEventListener('submit', function (evt) {
