@@ -6,7 +6,7 @@
   var pictureTemplate = document.querySelector('#picture-template').content;
 
   window.picture = {
-    renderPictures: function (pic) {
+    render: function (pic) {
       var elementPicture = pictureTemplate.cloneNode(true);
       elementPicture.querySelector('.picture-comments').textContent = pic.comments;
       elementPicture.querySelector('.picture-likes').textContent = pic.likes;

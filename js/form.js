@@ -4,8 +4,8 @@
 (function () {
 
   var STEP = 25;
-  var ESC_KEYCODE = 27;
-  var ENTER_KEYCODE = 13;
+  var MIN_SCALE = 25;
+  var MAX_SCALE = 100;
 
   var uploadSselectImage = document.querySelector('#upload-select-image');
   var uploadFormCancel = uploadSselectImage.querySelector('.upload-form-cancel');
@@ -13,41 +13,46 @@
   var uploadOverlay = uploadSselectImage.querySelector('.upload-overlay');
   var uploadFormDescription = uploadSselectImage.querySelector('.upload-form-description');
   var uploadResizeControlsValue = uploadSselectImage.querySelector('.upload-resize-controls-value');
-  var uploadResizeControlsButtons = uploadSselectImage.querySelectorAll('.upload-resize-controls-button');
+  var uploadResizeControls = uploadSselectImage.querySelector('.upload-resize-controls');
   var effectImagePreview = uploadOverlay.querySelector('.effect-image-preview');
   var uploadFormHashtags = uploadOverlay.querySelector('.upload-form-hashtags');
   var uploadEffectLevelPin = uploadOverlay.querySelector('.upload-effect-level-pin');
   var uploadEffectLevelVal = uploadOverlay.querySelector('.upload-effect-level-val');
+  var effectLevel = uploadOverlay.querySelector('.upload-effect-level');
 
-// -------------- Показ/скрытие формы кадрирования --------->
-  function onUploadFile() {
-    uploadSselectImage.querySelector('.upload-image').classList.add('hidden');
-    uploadOverlay.classList.remove('hidden');
-    document.addEventListener('keydown', onUploadOverlayEscPress);
-    uploadOverlay.querySelector('.upload-effect-level').style.display = 'none';
+  function adjustScale(evt) {
+    var step = evt.target.classList.contains('upload-resize-controls-button-inc') ? STEP : -STEP;
+    var valueFile = parseInt(uploadResizeControlsValue.value.substring(0, uploadResizeControlsValue.value.length - 1), 10);
+    var newSize = valueFile + step;
+
+    if (newSize <= MAX_SCALE && newSize >= MIN_SCALE) {
+      uploadResizeControlsValue.value = newSize + '%';
+      effectImagePreview.style.cssText = 'transform: scale(' + newSize / 100 + ')';
+    }
   }
 
-  function onUploadOverlayEscPress(evt) {
+// -------------- Показ/скрытие формы кадрирования --------->
+  function onCloseUploadOverlay(evt) {
     if (document.activeElement.classList.contains('upload-form-description')) {
       return;
     }
-    if (evt.keyCode === ESC_KEYCODE) {
-      onCloseUploadOverlay();
+    if ((evt.keyCode === window.helper.keyCodes.enter && document.activeElement.classList.contains('upload-form-cancel'))
+      || (evt.keyCode === window.helper.keyCodes.esc)
+      || (evt.type === 'click')){
+      uploadSselectImage.querySelector('.upload-image').classList.remove('hidden');
+      uploadOverlay.classList.add('hidden');
     }
   }
 
-  function onCloseUploadOverlay() {
-    uploadSselectImage.querySelector('.upload-image').classList.remove('hidden');
-    uploadOverlay.classList.add('hidden');
-  }
-
-  uploadFile.addEventListener('change', onUploadFile);
-  uploadFormCancel.addEventListener('click', onCloseUploadOverlay);
-  uploadFormCancel.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ENTER_KEYCODE) {
-      onCloseUploadOverlay();
-    }
+  uploadFile.addEventListener('change', function () {
+    uploadOverlay.classList.remove('hidden');
+    uploadFile.classList.add('hidden');
+    effectLevel.style.display = 'none';
   });
+
+  document.addEventListener('keydown', onCloseUploadOverlay, false);
+  uploadFormCancel.addEventListener('click', onCloseUploadOverlay);
+  window.initializeScale(uploadResizeControls, adjustScale);
 // <-------------- Показ/скрытие формы кадрирования ---------
 
 // ------ Валидация и отправка формы, применение фильтров к картинке ----->
@@ -81,21 +86,11 @@
     }
   });
 
-// Изменение значения масштаба картинки при нажатии на "+" или "-"
-  for (var i = 0; i < uploadResizeControlsButtons.length; i++) {
-    uploadResizeControlsButtons[i].addEventListener('click', function (event) {
-      var step = event.target.classList.contains('upload-resize-controls-button-inc') ? STEP : -STEP;
-      var valueFile = parseInt(uploadResizeControlsValue.value.substring(0, uploadResizeControlsValue.value.length - 1), 10);
-      var newSize = valueFile + step;
-      if (newSize <= 100 && newSize >= 25) {
-        uploadResizeControlsValue.value = newSize + '%';
-        effectImagePreview.style.cssText = 'transform: scale(' + newSize / 100 + ')';
-      }
-    });
-  }
 // <--------
 
 // ---- Применение фильтров ---->
+  window.initializeFilters(uploadOverlay.querySelector('.upload-effect-controls'), onChangeFilterEffects);
+
   function onChangeFilterEffects(evt) {
     var target = evt.target;
 
@@ -112,14 +107,12 @@
       return;
     }
   }
-
-  uploadOverlay.querySelector('.upload-effect-controls').addEventListener('click', onChangeFilterEffects);
 // <---- Применение фильтров ----
 
 // --------- Проверка написания хэштэгов ------>
-  function onValidHashtags() {
+  function onValidHashtags(evt) {
 
-    var target = event.target;
+    var target = evt.target;
     var arrayHashtags = target.value.split(' ');
     if (arrayHashtags.length > 5) {
       target.setCustomValidity('В строке указано больше 5 хэштэгов');
