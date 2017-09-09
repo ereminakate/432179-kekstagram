@@ -11,6 +11,15 @@ var helper = function () {
       evts.split(' ').map(function(evt) {
         el.addEventListener(evt, fn, false);
       });
+    },
+
+    debounce: function (fun, time) {
+      var lastTimeout;
+
+      if (lastTimeout) {
+        window.clearTimeout(lastTimeout);
+      }
+      lastTimeout = window.setTimeout(fun, time);
     }
   };
 }();
