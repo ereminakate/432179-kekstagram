@@ -1,7 +1,7 @@
 'use strict';
 
 // модуль для отрисовки увеличенного изображения
-var preview = function () {
+(function () {
 
   var galleryOverlay = document.querySelector('.gallery-overlay');
 
@@ -19,9 +19,9 @@ var preview = function () {
     galleryOverlay.classList.add('hidden');
   }
 
-  return {
+  window.preview = {
     setPhoto: setPhoto,
     show: show,
     hide: hide
-  }
-}();
+  };
+})();
