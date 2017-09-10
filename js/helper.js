@@ -1,8 +1,8 @@
 'use strict';
 
-var helper = function () {
+(function () {
 
-  return {
+  window.helper = {
     keyCodes: {
       enter: 13,
       esc: 27
@@ -14,12 +14,10 @@ var helper = function () {
     },
 
     debounce: function (fun, time) {
-      var lastTimeout;
-
-      if (lastTimeout) {
-        window.clearTimeout(lastTimeout);
+      if (window.lastTimeout) {
+        clearTimeout(window.lastTimeout);
       }
-      lastTimeout = window.setTimeout(fun, time);
+      window.lastTimeout = setTimeout(fun, time);
     }
   };
-}();
+})();

@@ -3,16 +3,11 @@
 // модуль, который работает с формой редактирования изображения
 (function () {
 
-  var STEP = 25;
-  var MIN_SCALE = 25;
-  var MAX_SCALE = 100;
-
   var uploadSselectImage = document.querySelector('#upload-select-image');
   var uploadFormCancel = uploadSselectImage.querySelector('.upload-form-cancel');
   var uploadFile = uploadSselectImage.querySelector('#upload-file');
   var uploadOverlay = uploadSselectImage.querySelector('.upload-overlay');
   var uploadFormDescription = uploadSselectImage.querySelector('.upload-form-description');
-  var uploadResizeControlsValue = uploadSselectImage.querySelector('.upload-resize-controls-value');
   var uploadResizeControls = uploadSselectImage.querySelector('.upload-resize-controls');
   var effectImagePreview = uploadOverlay.querySelector('.effect-image-preview');
   var uploadFormHashtags = uploadOverlay.querySelector('.upload-form-hashtags');
@@ -20,16 +15,18 @@
   var uploadEffectLevelVal = uploadOverlay.querySelector('.upload-effect-level-val');
   var effectLevel = uploadOverlay.querySelector('.upload-effect-level');
 
-  function adjustScale(evt) {
-    var step = evt.target.classList.contains('upload-resize-controls-button-inc') ? STEP : -STEP;
-    var valueFile = parseInt(uploadResizeControlsValue.value.substring(0, uploadResizeControlsValue.value.length - 1), 10);
-    var newSize = valueFile + step;
+  // инициализация масштабирования
+  window.initializeScale(document.querySelector('.upload-resize-controls'), function (value) {
+    document.querySelector('.upload-resize-controls-value').value = value + '%';
+    document.querySelector('.effect-image-preview').style.cssText = 'transform: scale(' + value / 100 + ')';
+  });
 
-    if (newSize <= MAX_SCALE && newSize >= MIN_SCALE) {
-      uploadResizeControlsValue.value = newSize + '%';
-      effectImagePreview.style.cssText = 'transform: scale(' + newSize / 100 + ')';
-    }
-  }
+  // инициализация фильтров
+  window.initializeFilters(uploadOverlay.querySelector('.upload-effect-controls'), function (node) {
+    effectImagePreview.style.filter = '';
+    effectImagePreview.className = 'effect-image-preview';
+    effectImagePreview.classList.add(node.id.replace('upload-', ''));
+  });
 
 // -------------- Показ/скрытие формы кадрирования --------->
   function onCloseUploadOverlay(evt) {
@@ -103,8 +100,6 @@
       } else {
         uploadOverlay.querySelector('.upload-effect-level').style.display = '';
       }
-    } else {
-      return;
     }
   }
 // <---- Применение фильтров ----
@@ -153,8 +148,8 @@
   uploadEffectLevelPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
 
-    var MIN_COORD = 8;
-    var MAX_COORD = 446;
+    var MIN_COORD = uploadEffectLevelPin.offsetWidth / 2;
+    var MAX_COORD = uploadEffectLevelPin.parentNode.offsetWidth;
     var sliderCoord;
 
     var startCoordsX = evt.clientX;
@@ -190,7 +185,9 @@
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   });
+
   // Функция реализует изменение фильтра на картинку в заданном значении ползунка
+
   function onMousedownChangeFilter(value) {
     if (effectImagePreview.classList.contains('effect-chrome')) {
       effectImagePreview.style.filter = 'grayscale(' + (value / 100) + ')';

@@ -1,12 +1,13 @@
 'use strict';
 
 // модуль, который работает с галереей изображений
-var gallery = function () {
+(function () {
 
   var listPictures = document.querySelector('.pictures');
   var uploadOverlay = document.querySelector('.upload-overlay');
-  var filters = document.querySelector('.filters');
   var filterPictures = document.querySelector('.filters');
+  var previewImage = uploadOverlay.querySelector('.effect-image-preview');
+  var form = document.querySelector('.upload-form');
 
   var arrPictures = [];
   var arrRecommendPictures = [];
@@ -15,7 +16,7 @@ var gallery = function () {
     arrRecommendPictures = data.slice();
     arrPictures = data;
     renderPictures(arrPictures);
-    filters.classList.remove('hidden');
+    filterPictures.classList.remove('hidden');
   };
 
   var errorHandler = function (errorMessage) {
@@ -63,16 +64,20 @@ var gallery = function () {
     }
   };
 
-  function randomArray(arr) {
-    arr.sort(function () {
+  function randomArray(arrs) {
+    arrs.sort(function () {
       return Math.random() > 0.5;
     });
-    return arr;
+    return arrs;
+  }
+
+  function applyFilter() {
+    renderPictures(sortPictures(document.activeElement));
   }
 
   filterPictures.addEventListener('click', function () {
     if (document.activeElement.tagName === 'INPUT') {
-      window.helper.debounce(renderPictures(sortPictures(document.activeElement)), 500);
+      window.helper.debounce(applyFilter, 500);
     }
   }, false);
 
@@ -98,20 +103,16 @@ var gallery = function () {
     }
   }
 
-  var form = document.querySelector('.upload-form');
-  function resetValuesForm() {
-    form.reset();
-  }
-
   window.helper.addListeners(document.querySelector('.pictures'), 'click keydown', openGallery);
   document.querySelector('.gallery-overlay-close').addEventListener('click', closeGallery);
   document.addEventListener('keydown', closeGallery);
 
   form.addEventListener('submit', function (evt) {
+    evt.preventDefault();
     window.backend.save(new FormData(form), function () {
       uploadOverlay.classList.add('hidden');
-      resetValuesForm();
+      form.reset();
+      previewImage.className = 'effect-image-preview';
     }, errorHandler);
-    evt.preventDefault();
   }, false);
-}();
+})();
