@@ -34,7 +34,7 @@
     }
     if ((evt.keyCode === window.helper.keyCodes.enter && document.activeElement.classList.contains('upload-form-cancel'))
       || (evt.keyCode === window.helper.keyCodes.esc)
-      || (evt.type === 'click')){
+      || (evt.type === 'click')) {
       uploadSselectImage.querySelector('.upload-image').classList.remove('hidden');
       uploadOverlay.classList.add('hidden');
     }
