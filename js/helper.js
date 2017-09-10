@@ -8,7 +8,7 @@
       esc: 27
     },
     addListeners: function (el, evts, fn) {
-      evts.split(' ').map(function(evt) {
+      evts.split(' ').map(function (evt) {
         el.addEventListener(evt, fn, false);
       });
     },
