@@ -8,7 +8,6 @@
   var uploadFile = uploadSselectImage.querySelector('#upload-file');
   var uploadOverlay = uploadSselectImage.querySelector('.upload-overlay');
   var uploadFormDescription = uploadSselectImage.querySelector('.upload-form-description');
-  var uploadResizeControls = uploadSselectImage.querySelector('.upload-resize-controls');
   var effectImagePreview = uploadOverlay.querySelector('.effect-image-preview');
   var uploadFormHashtags = uploadOverlay.querySelector('.upload-form-hashtags');
   var uploadEffectLevelPin = uploadOverlay.querySelector('.upload-effect-level-pin');
@@ -49,7 +48,6 @@
 
   document.addEventListener('keydown', onCloseUploadOverlay, false);
   uploadFormCancel.addEventListener('click', onCloseUploadOverlay);
-  window.initializeScale(uploadResizeControls, adjustScale);
 // <-------------- Показ/скрытие формы кадрирования ---------
 
 // ------ Валидация и отправка формы, применение фильтров к картинке ----->
@@ -84,25 +82,6 @@
   });
 
 // <--------
-
-// ---- Применение фильтров ---->
-  window.initializeFilters(uploadOverlay.querySelector('.upload-effect-controls'), onChangeFilterEffects);
-
-  function onChangeFilterEffects(evt) {
-    var target = evt.target;
-
-    if (target.tagName === 'INPUT') {
-      effectImagePreview.style.filter = '';
-      effectImagePreview.className = 'effect-image-preview';
-      effectImagePreview.classList.add(target.id.replace('upload-', ''));
-      if (effectImagePreview.classList.contains('effect-none')) {
-        uploadOverlay.querySelector('.upload-effect-level').style.display = 'none';
-      } else {
-        uploadOverlay.querySelector('.upload-effect-level').style.display = '';
-      }
-    }
-  }
-// <---- Применение фильтров ----
 
 // --------- Проверка написания хэштэгов ------>
   function onValidHashtags(evt) {
