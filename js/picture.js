@@ -8,7 +8,7 @@
   window.picture = {
     render: function (pic) {
       var elementPicture = pictureTemplate.cloneNode(true);
-      elementPicture.querySelector('.picture-comments').textContent = pic.comments;
+      elementPicture.querySelector('.picture-comments').textContent = pic.comments.length;
       elementPicture.querySelector('.picture-likes').textContent = pic.likes;
       elementPicture.querySelector('img').setAttribute('src', pic.url);
 
