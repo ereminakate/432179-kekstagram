@@ -2,8 +2,8 @@
 
 (function () {
   window.initializeFilters = function (el, fn) {
-    el.addEventListener('click', function (event) {
-      var target = event.target;
+    el.addEventListener('click', function (evt) {
+      var target = evt.target;
       var effectImagePreview = document.querySelector('.effect-image-preview');
       var uploadOverlay = document.querySelector('.upload-overlay');
 
