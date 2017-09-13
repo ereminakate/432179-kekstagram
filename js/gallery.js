@@ -12,14 +12,14 @@
   var arrPictures = [];
   var arrRecommendPictures = [];
 
-  function onSuccess(data) {
+  function onSuccessResult(data) {
     arrRecommendPictures = data.slice();
     arrPictures = data;
     renderPictures(arrPictures);
     filterPictures.classList.remove('hidden');
   }
 
-  function onError(errorMessage) {
+  function onErrorResult(errorMessage) {
     var node = document.createElement('div');
     node.style.position = 'absolute';
     node.style.zIndex = '100';
@@ -83,7 +83,7 @@
   }, false);
 
   // Загрузка картинок с сервера
-  window.backend.load(onSuccess, onError);
+  window.backend.load(onSuccessResult, onErrorResult);
 
   // Открытие/закрытие картинки
   function openGallery(evt) {
@@ -114,6 +114,6 @@
       uploadOverlay.classList.add('hidden');
       form.reset();
       previewImage.className = 'effect-image-preview';
-    }, onError);
+    }, onErrorResult);
   }, false);
 })();
