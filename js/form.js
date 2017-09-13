@@ -12,7 +12,8 @@
   var uploadFormHashtags = uploadOverlay.querySelector('.upload-form-hashtags');
   var uploadEffectLevelPin = uploadOverlay.querySelector('.upload-effect-level-pin');
   var uploadEffectLevelVal = uploadOverlay.querySelector('.upload-effect-level-val');
-  var effectLevel = uploadOverlay.querySelector('.upload-effect-level');
+  var effectLevel = uploadOverlay.querySelector('.upload-e' +
+    'ffect-level');
 
   // инициализация масштабирования
   window.initializeScale(document.querySelector('.upload-resize-controls'), function (value) {
@@ -54,26 +55,22 @@
 
   uploadFormDescription.addEventListener('invalid', function () {
     if (!uploadFormDescription.validity.valid) {
-      if (uploadFormDescription.value.length < 30) {
-        uploadFormDescription.setCustomValidity('Комментарий должен содержать не менее 30 символов');
-        uploadFormDescription.style.border = '1px solid red';
-      } else if (uploadFormDescription.value.length > 100) {
-        uploadFormDescription.setCustomValidity('Комментарий должен содержать не более 100 символов');
-        uploadFormDescription.style.border = '1px solid red';
-      } else if (uploadFormDescription.validity.valueMissing) {
-        uploadFormDescription.setCustomValidity('Обязательное поле');
-        uploadFormDescription.style.border = '1px solid red';
+      if (uploadFormDescription.validity.valueMissing) {
+        if (uploadFormDescription.value.length > 140) {
+          uploadFormDescription.setCustomValidity('Комментарий должен содержать не более 140 символов');
+          uploadFormDescription.style.border = '1px solid red';
+        }
+      } else {
+        uploadFormDescription.setCustomValidity('');
+        uploadFormDescription.style.border = 'none';
       }
-    } else {
-      uploadFormDescription.setCustomValidity('');
-      uploadFormDescription.style.border = 'none';
     }
   });
 
   uploadFormDescription.addEventListener('input', function (evt) {
     var target = evt.target;
-    if (target.value.length < 30) {
-      target.setCustomValidity('Комментарий должен содержать не менее 30 символов');
+    if (target.value.length > 140) {
+      target.setCustomValidity('Комментарий должен содержать не более 140 символов');
       uploadFormDescription.style.border = '1px solid red';
     } else {
       target.setCustomValidity('');
@@ -82,7 +79,6 @@
   });
 
 // <--------
-
 // --------- Проверка написания хэштэгов ------>
   function onValidHashtags(evt) {
 
@@ -133,7 +129,7 @@
 
     var startCoordsX = evt.clientX;
 
-    var onMouseMove = function (moveEvt) {
+    function onMouseMove(moveEvt) {
       moveEvt.preventDefault();
 
       var shiftX = startCoordsX - moveEvt.clientX;
@@ -152,14 +148,14 @@
       uploadEffectLevelVal.style.width = valPercent > 100 ? 100 + '%' : valPercent + '%';
 
       onMousedownChangeFilter(valPercent);
-    };
+    }
 
-    var onMouseUp = function (upEvt) {
+    function onMouseUp(upEvt) {
       upEvt.preventDefault();
 
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
-    };
+    }
 
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);

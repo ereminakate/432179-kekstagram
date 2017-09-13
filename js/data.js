@@ -16,23 +16,23 @@
     for (var i = 0; i < PHOTO_COUNT; i++) {
       arrDescriptionPictures[i] = {
         url: './photos/' + (i + 1) + '.jpg',
-        likes: randomInteger(LIKES_MIN, LIKES_MAX),
-        comments: randomComments()
+        likes: randomizeInteger(LIKES_MIN, LIKES_MAX),
+        comments: randomizeComments()
       };
     }
     return arrDescriptionPictures;
   }
 
 // Функция выбора случайных чисел
-  function randomInteger(min, max) {
+  function randomizeInteger(min, max) {
     return Math.floor(min + Math.random() * (max - min + 1));
   }
 
-  function randomComments() {
-    var numberComments = randomInteger(COMMENTS_MIN, COMMENTS_MAX);
+  function randomizeComments() {
+    var numberComments = randomizeInteger(COMMENTS_MIN, COMMENTS_MAX);
     var comments = '';
     for (var i = 0; i < numberComments; i++) {
-      comments += (USER_COMMENTS[randomInteger(0, USER_COMMENTS.length - 1)] + '\n');
+      comments += (USER_COMMENTS[randomizeInteger(0, USER_COMMENTS.length - 1)] + '\n');
     }
     return comments + ' ' + numberComments;
   }

@@ -12,25 +12,26 @@
   var arrPictures = [];
   var arrRecommendPictures = [];
 
-  var successHandler = function (data) {
+  function onSuccess(data) {
     arrRecommendPictures = data.slice();
     arrPictures = data;
     renderPictures(arrPictures);
     filterPictures.classList.remove('hidden');
-  };
+  }
 
-  var errorHandler = function (errorMessage) {
+  function onError(errorMessage) {
     var node = document.createElement('div');
     node.style.position = 'absolute';
     node.style.zIndex = '100';
-    node.style.margin = '0 auto';
+    node.style.left = 0;
+    node.style.right = 0;
     node.style.textAlign = 'center';
     node.style.backgroundColor = 'white';
     node.style.color = 'red';
     node.style.fontWeight = 'bold';
     node.textContent = errorMessage;
     document.body.insertAdjacentElement('afterbegin', node);
-  };
+  }
 
   function renderPictures(pics) {
     listPictures.innerHTML = '';
@@ -44,7 +45,7 @@
   }
 
   // Фильтр картинок
-  var sortPictures = function (el) {
+  function sortPictures(el) {
     if (el.id === 'filter-popular') {
       return arrPictures.sort(function (left, right) {
         return right.likes - left.likes;
@@ -58,13 +59,13 @@
         return right.comments.length - left.comments.length;
       });
     } else if (el.id === 'filter-random') {
-      return randomArray(arrRecommendPictures.slice());
+      return randomizeArray(arrRecommendPictures.slice());
     } else {
       return arrRecommendPictures;
     }
-  };
+  }
 
-  function randomArray(arrs) {
+  function randomizeArray(arrs) {
     arrs.sort(function () {
       return Math.random() > 0.5;
     });
@@ -82,7 +83,7 @@
   }, false);
 
   // Загрузка картинок с сервера
-  window.backend.load(successHandler, errorHandler);
+  window.backend.load(onSuccess, onError);
 
   // Открытие/закрытие картинки
   function openGallery(evt) {
@@ -113,6 +114,6 @@
       uploadOverlay.classList.add('hidden');
       form.reset();
       previewImage.className = 'effect-image-preview';
-    }, errorHandler);
+    }, onError);
   }, false);
 })();
